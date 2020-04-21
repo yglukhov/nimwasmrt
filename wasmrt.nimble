@@ -9,9 +9,9 @@ license       = "MIT"
 
 import os, oswalkdir
 
-proc buildExample(name: string, shouldFail = false) =
+proc buildExample(name: string, shouldFail = false, flags = "--gc:arc") =
   echo "Running test ", name, (if shouldFail: " [should fail]" else: "")
-  exec "nim c --out:" & name & ".wasm tests/" & name
+  exec "nim c --out:" & name & ".wasm " & flags & " tests/" & name
   exec "wasm-gc " & name & ".wasm"
   exec "wasm2wat -o " & name & ".wast " & name & ".wasm"
   if shouldFail:
@@ -33,3 +33,6 @@ task test, "Test":
         buildExample(sf.name)
       elif sf.name.startsWith("f_"):
         buildExample(sf.name, shouldFail = true)
+
+task testJsbind, "Test jsbind":
+  buildExample("d_jsbind", flags = "")
